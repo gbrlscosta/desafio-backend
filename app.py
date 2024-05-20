@@ -2,7 +2,8 @@ import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, Response
-
+import win32com.client as win32
+import pythoncom
 # Carregar variáveis de ambiente
 load_dotenv()
 
@@ -43,7 +44,7 @@ def create_user():
     except Exception as e:
         return jsonify({"Erro": str(e)}), 500
 
-@app.route("/dbpicpay/transfer", methods=["PUT"])
+@app.route("/dbpicpay/transfer", methods=["PATCH"])
 def transfer():
     data = request.json
     value = data.get('value')
@@ -73,6 +74,23 @@ def transfer():
         saldo_payee = float(payee['saldo'])
         new_saldo_payee = saldo_payee + value
         collection.update_one({'id': id_payee}, {'$set': {'saldo': new_saldo_payee}})
+
+        try:
+
+            pythoncom.CoInitialize()
+            outlook = win32.Dispatch('outlook.application')
+            email_out = outlook.CreateItem(0)
+            email = payee['email']
+            email_out.To = email
+            email_out.Subject = "Transferencia recebida!"
+            email_out.HTMLBody = f"""
+            <p>Valor: {value}</p>
+            <p>Nome Pagador: {payer['nome_completo']}</p>
+            <p>Nome Recebedor: {payee['nome_completo']}</p>
+            """
+            email_out.Send()
+        except Exception as e:
+            return jsonify({"Erro": f"Falha ao enviar email: {str(e)}"}), 500
 
         return jsonify({'Status': 'Transferencia Concluida!'}), 200
     except Exception as e:

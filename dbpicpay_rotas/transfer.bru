@@ -4,7 +4,7 @@ meta {
   seq: 4
 }
 
-put {
+patch {
   url: http://localhost:5005/dbpicpay/transfer
   body: json
   auth: none
@@ -12,8 +12,8 @@ put {
 
 body:json {
   {
-    "value": 500,
-    "payer": 3,
-    "payee": 1
+    "value": 100,
+    "payer": 1,
+    "payee": 3
   }
 }
