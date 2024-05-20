@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "dbpicpay_rotas",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

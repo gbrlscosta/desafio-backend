@@ -1,0 +1,23 @@
+meta {
+  name: create user
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:5005/dbpicpay
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "cpf": cpf,
+      "email": "email",
+      "id": id,
+      "nome_completo": "nome",
+      "saldo": saldo,
+      "senha": senha,
+      "tipo": "lojista" ou "usuario"
+  }
+}
