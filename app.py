@@ -61,36 +61,42 @@ def transfer():
     if not value or not id_payer or not id_payee:
         return jsonify({"Erro": "Valor, pagador e recebedor são obrigatórios!"}), 400
 
-    if value <= 0:
-        return jsonify({"Erro": "O valor da transferência deve ser maior que zero!"}), 400
+    if validation_antifraud == True:
 
-    try:
-        payer = collection.find_one({'id': id_payer})
-        payee = collection.find_one({'id': id_payee})
+        if value <= 0:
+            return jsonify({"Erro": "O valor da transferência deve ser maior que zero!"}), 400
 
-        if payer is None or payee is None:
-            return jsonify({"Erro": "Pagador ou recebedor não encontrados"}), 404
+        try:
+            payer = collection.find_one({'id': id_payer})
+            payee = collection.find_one({'id': id_payee})
 
-        if payer['tipo'] == 'lojista':
-            return jsonify({'Erro': 'O Usuário não pode fazer transferência!'}), 403
+            if payer is None or payee is None:
+                return jsonify({"Erro": "Pagador ou recebedor não encontrados"}), 404
 
-        saldo_payer = float(payer['saldo'])
-        saldo_payee = float(payee['saldo'])
+            if payer['tipo'] == 'lojista':
+                return jsonify({'Erro': 'O Usuário não pode fazer transferência!'}), 403
 
-        if saldo_payer < value:
-            return jsonify({"Erro": "Saldo Insuficiente!"}), 400
+            saldo_payer = float(payer['saldo'])
+            saldo_payee = float(payee['saldo'])
 
-        new_saldo_payer = saldo_payer - value
-        new_saldo_payee = saldo_payee + value
+            if saldo_payer < value:
+                return jsonify({"Erro": "Saldo Insuficiente!"}), 400
 
-        collection.update_one({'id': id_payer}, {'$set': {'saldo': new_saldo_payer}})
-        collection.update_one({'id': id_payee}, {'$set': {'saldo': new_saldo_payee}})
+            new_saldo_payer = saldo_payer - value
+            new_saldo_payee = saldo_payee + value
 
-        send_email(value, payer, payee)
+            collection.update_one({'id': id_payer}, {'$set': {'saldo': new_saldo_payer}})
+            collection.update_one({'id': id_payee}, {'$set': {'saldo': new_saldo_payee}})
 
-        return jsonify({'Status': 'Transferência Concluída!'}), 200
-    except Exception as e:
-        return jsonify({"Erro": str(e)}), 500
+            send_email(value, payer, payee)
+
+            return jsonify({'Status': 'Transferência Concluída!'}), 200
+        except Exception as e:
+            collection.update_one({'id': id_payer}, {'$set': {'saldo': saldo_payer}})
+            collection.update_one({'id': id_payee}, {'$set': {'saldo': saldo_payee}})
+            return jsonify({"Erro": str(e)}), 500
+    else:
+        return jsonify({"Erro": "Fraude!"}), 403
 
 def send_email(value, payer, payee):
     try:
