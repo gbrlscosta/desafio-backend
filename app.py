@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import win32com.client as win32
 import pythoncom
+from datetime import datetime
 
 load_dotenv()
 
@@ -98,75 +99,15 @@ def send_email(value, payer, payee):
         email_out = outlook.CreateItem(0)
         email_out.To = payer['email'] + '; ' + payee['email']
         email_out.Subject = "Transferência realizada!"
+        data = datetime.now().strftime("%d/%m/%Y")
         email_out.HTMLBody = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes da Transação</title>
-    <style>
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }}
-        .container {{
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }}
-        .header {{
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }}
-        .value {{
-            font-size: 2em;
-            font-weight: bold;
-            color: #27ae60;
-            margin-bottom: 20px;
-        }}
-        .info {{
-            font-size: 1.2em;
-            color: #34495e;
-            margin-bottom: 10px;
-        }}
-        .info span {{
-            display: block;
-            font-weight: bold;
-            color: #2980b9;
-        }}
-        .footer {{
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #95a5a6;
-        }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">Detalhes da Transação</div>
-        <div class="value">Valor: {value}</div>
-        <div class="info">
-            <span>Nome Pagador:</span> {payer['nome_completo']}
-        </div>
-        <div class="info">
-            <span>Nome Recebedor:</span> {payee['nome_completo']}
-        </div>
-        <div class="footer">Obrigado por utilizar nossos serviços.</div>
-    </div>
-</body>
-</html>
-"""
-
+        <center><h2> Detalhes da Transferência </h2></center>
+        <center><h2 style="color:#00A000"><strong>R${value}</strong></h2></center>
+        <hr>
+        <p>Data: <strong>{data}</strong>
+        <p>Nome Pagador: <strong>{payer['nome_completo']}</strong></p>
+        <p>Nome Recebedor: <strong>{payee['nome_completo']}</strong></p>
+        """
         email_out.Send()
     except Exception as e:
         print(f"Falha ao enviar email: {str(e)}")
