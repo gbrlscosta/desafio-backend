@@ -1,4 +1,4 @@
 .env
-dbpicpay_rotas
-__pycache__
+dbpicpay_rotas/
+__pycache__/
 .gitignore
