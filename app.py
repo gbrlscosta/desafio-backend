@@ -39,7 +39,7 @@ def read():
 
 
 
-@app.route("/dbpicpay", methods=["POST"])
+@app.route("/dbpicpay/clients", methods=["POST"])
 def create_user():
     try:
         data = request.json
@@ -167,9 +167,5 @@ def user_validation(data):
 
 
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5005, host="0.0.0.0")
-
-
-
-
+# if __name__ == "__main__":
+#     app.run(debug=True, port=5005, host="0.0.0.0")

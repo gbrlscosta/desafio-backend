@@ -1,4 +1,3 @@
-.gitignore
 .env
-dbpicpay_rotas/
-__pycache__/
+picpay_rotas/
+.gitignore
