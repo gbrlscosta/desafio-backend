@@ -96,7 +96,6 @@ def transfer():
     saldo_payee = payee['saldo']
 
     try:
-
         collection.update_one({'id': id_payer}, {'$inc': {'saldo': -value}})
         collection.update_one({'id': id_payee}, {'$inc': {'saldo': value}})
         send_email(value, payer, payee)
